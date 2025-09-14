@@ -18,4 +18,8 @@ public class SearchService {
         return new SearchResult(UUID.randomUUID(),query,"Search result");
     }
 
+
+
+
+
 }
