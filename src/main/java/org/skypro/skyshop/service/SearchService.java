@@ -17,5 +17,4 @@ public class SearchService {
     public SearchResult search(String query) {
         return new SearchResult(UUID.randomUUID(),query,"Search result");
     }
-
 }
