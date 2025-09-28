@@ -1,5 +1,6 @@
 package org.skypro.skyshop.service;
 
+import org.skypro.skyshop.exceptions.NoSuchProductException;
 import org.skypro.skyshop.model.basket.ProductBasket;
 import org.skypro.skyshop.exceptions.BestResultNotFound;
 import org.skypro.skyshop.model.article.Article;
@@ -64,8 +65,12 @@ public class StorageService {
         availableProducts.put(product.getId(), product);
 
     }
-    public Optional<Product> getProductById(UUID id) {
-        return Optional.ofNullable(availableProducts.get(id));
+    public Product getProductById(UUID id) {
+        if(availableProducts.containsKey(id)) {
+            return availableProducts.get(id);
+        }
+        throw new NoSuchProductException("Такой продукт не найден!!!");
+
     }
     public Set<Product> deleteByName(String name) {
 
