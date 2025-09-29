@@ -11,7 +11,7 @@ public class ShopControllerAdvice {
     public ResponseEntity<ShopError> handleNoSuchProductException(NoSuchProductException e) {
         ShopError shopError=new ShopError(
                 "Product_001",
-                "Продукт с таким ID не найден!"
+                e.getMessage()
         );
         return new ResponseEntity<>(shopError, HttpStatus.NOT_FOUND);
     }
