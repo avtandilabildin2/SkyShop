@@ -1,5 +1,6 @@
 package org.skypro.skyshop.controller;
 
+import org.skypro.skyshop.exceptions.BestResultNotFound;
 import org.skypro.skyshop.model.article.Article;
 import org.skypro.skyshop.model.basket.UserBasket;
 import org.skypro.skyshop.model.product.Product;
@@ -46,7 +47,7 @@ public class ShopController {
         return  storageService.getArticles().values();
     }
     @GetMapping("/search")
-    public SearchResult search(String pattern) {
+    public SearchResult search(String pattern) throws BestResultNotFound {
        return searchService.search(pattern);
     }
 }

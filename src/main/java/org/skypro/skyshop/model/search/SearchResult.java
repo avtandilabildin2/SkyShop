@@ -27,7 +27,7 @@ public class SearchResult {
         this.name = name;
         this.contentType = contentType;
     }
-    public SearchResult fromSearchable(Searchable searchable) {
+    public static SearchResult fromSearchable(Searchable searchable) {
         SearchResult result = new SearchResult(searchable.getId(),searchable.getSearchableName(), searchable.type());
         if(result.getId() == null) {
             throw new NoSuchProductException("Нету такого продукта!!!");

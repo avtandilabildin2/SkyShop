@@ -1,5 +1,6 @@
 package org.skypro.skyshop.service;
 
+import jakarta.annotation.PostConstruct;
 import org.skypro.skyshop.exceptions.NoSuchProductException;
 import org.skypro.skyshop.model.basket.ProductBasket;
 import org.skypro.skyshop.exceptions.BestResultNotFound;
@@ -15,14 +16,13 @@ import java.util.*;
 @Service
 public class StorageService {
 
-    private final Map<UUID, Article> articles;
-    private final Map<UUID, Product> availableProducts;
+    private final Map<UUID, Article> articles=new HashMap<>();
+    private final Map<UUID, Product> availableProducts=new HashMap<>();
 
-    public StorageService() throws BestResultNotFound {
-        this.articles = new HashMap<>();
-        this.availableProducts = new HashMap<>();
-        init();
+    public StorageService()  {
+
     }
+    @PostConstruct
     private void init() throws BestResultNotFound {
         SimpleProduct simpleProduct1=new SimpleProduct("title1",UUID.randomUUID(),12);
         SimpleProduct simpleProduct2=new SimpleProduct("title2",UUID.randomUUID(),12);
@@ -49,7 +49,6 @@ public class StorageService {
 
 
         basket.printBasket();
-        ProductBasket basket2=new ProductBasket();
 
         SearchEngine searchEngine=new SearchEngine();
         searchEngine.addSearchable(new SimpleProduct("title1",UUID.randomUUID(),12));
