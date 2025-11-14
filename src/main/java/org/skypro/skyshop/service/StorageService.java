@@ -1,13 +1,14 @@
 package org.skypro.skyshop.service;
 
-import org.skypro.skyshop.ProductBasket;
+import jakarta.annotation.PostConstruct;
+import org.skypro.skyshop.exceptions.NoSuchProductException;
+import org.skypro.skyshop.model.basket.ProductBasket;
 import org.skypro.skyshop.exceptions.BestResultNotFound;
 import org.skypro.skyshop.model.article.Article;
 import org.skypro.skyshop.model.product.Product;
 import org.skypro.skyshop.model.product.SimpleProduct;
 import org.skypro.skyshop.model.search.SearchEngine;
 import org.skypro.skyshop.model.search.Searchable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,14 +16,13 @@ import java.util.*;
 @Service
 public class StorageService {
 
-    private final Map<UUID, Article> articles;
-    private final Map<UUID, Product> products;
+    private final Map<UUID, Article> articles=new HashMap<>();
+    private final Map<UUID, Product> availableProducts=new HashMap<>();
 
-    public StorageService() throws BestResultNotFound {
-        this.articles = new HashMap<>();
-        this.products = new HashMap<>();
-        init();
+    public StorageService()  {
+
     }
+    @PostConstruct
     private void init() throws BestResultNotFound {
         SimpleProduct simpleProduct1=new SimpleProduct("title1",UUID.randomUUID(),12);
         SimpleProduct simpleProduct2=new SimpleProduct("title2",UUID.randomUUID(),12);
@@ -30,19 +30,12 @@ public class StorageService {
         SimpleProduct simpleProduct4=new SimpleProduct("title4",UUID.randomUUID(),12);
         SimpleProduct simpleProduct5=new SimpleProduct("title4",UUID.randomUUID(),12);
         ProductBasket basket=new ProductBasket();
-        basket.addToProductBasket(simpleProduct1);
-        basket.addToProductBasket(simpleProduct2);
-        basket.addToProductBasket(simpleProduct3);
-        basket.addToProductBasket(simpleProduct4);
-        basket.addToProductBasket(simpleProduct5);
-        basket.deleteByName("title1");
-        basket.deleteByName("title2");
-        basket.deleteByName("title3");
-        products.put(simpleProduct1.getId(), simpleProduct1);
-        products.put(simpleProduct2.getId(), simpleProduct2);
-        products.put(simpleProduct3.getId(), simpleProduct3);
-        products.put(simpleProduct4.getId(), simpleProduct4);
-        products.put(simpleProduct5.getId(), simpleProduct5);
+
+        availableProducts.put(simpleProduct1.getId(), simpleProduct1);
+        availableProducts.put(simpleProduct2.getId(), simpleProduct2);
+        availableProducts.put(simpleProduct3.getId(), simpleProduct3);
+        availableProducts.put(simpleProduct4.getId(), simpleProduct4);
+        availableProducts.put(simpleProduct5.getId(), simpleProduct5);
         Article article1=new Article("title1","text1",UUID.randomUUID());
         Article article2=new Article("title2","text2",UUID.randomUUID());
         Article article3=new Article("title3","text3",UUID.randomUUID());
@@ -56,8 +49,6 @@ public class StorageService {
 
 
         basket.printBasket();
-        basket.deleteByName(null);
-        ProductBasket basket2=new ProductBasket();
 
         SearchEngine searchEngine=new SearchEngine();
         searchEngine.addSearchable(new SimpleProduct("title1",UUID.randomUUID(),12));
@@ -66,27 +57,25 @@ public class StorageService {
         System.out.println(searchEngine.searchable("title2"));
         SimpleProduct simpleProduct=new SimpleProduct("title4",UUID.randomUUID(),12);
         System.out.println(simpleProduct.searchTerm());
-        Set<Product> deletedProducts=basket.deleteByName("title1");
-        if(deletedProducts.isEmpty()){
-            System.out.println("Корзина пуста!!!");
-        }
-        else{
-            for (Product product : deletedProducts) {
-                System.out.println(product);
-            }
-        }
+
     }
 
     public void addToProductBasket(Product product) {
-        products.put(product.getId(), product);
+        availableProducts.put(product.getId(), product);
 
     }
+    public Product getProductById(UUID id) {
+        if(availableProducts.containsKey(id)) {
+            return availableProducts.get(id);
+        }
+        throw new NoSuchProductException("Такой продукт не найден!!!");
 
+    }
     public Set<Product> deleteByName(String name) {
 
         Set<Product> result = new HashSet<>();
-        if (products.containsKey(name)) {
-            result.add(products.remove(name));
+        if (availableProducts.containsKey(name)) {
+            result.add(availableProducts.remove(name));
 
         } else{
             System.out.println("Продукт с таким именем не существует!!!");
@@ -97,30 +86,30 @@ public class StorageService {
     }
     public void printBasket() {
 
-        products.values()
+        availableProducts.values()
                 .stream()
                 .forEach(i-> System.out.println(i.toString()));
 
     }
     public int sumOfProductBasket() {
 
-        int sum = products.values()
+        int sum = availableProducts.values()
                 .stream()
                 .mapToInt(Product::getPrice)
                 .sum();
         return sum;
     }
     public void allThing() {
-        if (products.isEmpty()) {
+        if (availableProducts.isEmpty()) {
             System.out.println("В корзине пусто");
             return;
         }
         System.out.println("Содержимое корзины!");
-        products.values().stream()
+        availableProducts.values().stream()
                 .forEach(i-> System.out.println(i));
 
         int sum = sumOfProductBasket();
-        long count= products.values()
+        long count= availableProducts.values()
                 .stream().filter(Product::isSpecial)
                 .count();
         System.out.println("Итого: "+sum);
@@ -128,10 +117,10 @@ public class StorageService {
     }
 
     public boolean esExist(String productName) {
-        return products.containsKey(productName);
+        return availableProducts.containsKey(productName);
     }
     public void clearProductBasket() {
-        products.clear();
+        availableProducts.clear();
     }
 
 
@@ -139,12 +128,12 @@ public class StorageService {
         return articles;
     }
 
-    public Map<UUID, Product> getProducts() {
-        return products;
+    public Map<UUID, Product> getAvailableProducts() {
+        return availableProducts;
     }
     public List<Searchable> getSearchables() {
         List<Searchable> result = new ArrayList<>();
-        result.addAll(products.values());
+        result.addAll(availableProducts.values());
         result.addAll(articles.values());
         return result;
     }

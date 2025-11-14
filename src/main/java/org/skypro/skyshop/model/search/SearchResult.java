@@ -1,5 +1,7 @@
 package org.skypro.skyshop.model.search;
 
+import org.skypro.skyshop.exceptions.NoSuchProductException;
+
 import java.util.UUID;
 
 public class SearchResult {
@@ -25,8 +27,11 @@ public class SearchResult {
         this.name = name;
         this.contentType = contentType;
     }
-    public SearchResult fromSearchable(Searchable searchable) {
+    public static SearchResult fromSearchable(Searchable searchable) {
         SearchResult result = new SearchResult(searchable.getId(),searchable.getSearchableName(), searchable.type());
+        if(result.getId() == null) {
+            throw new NoSuchProductException("Нету такого продукта!!!");
+        }
         return result;
     }
 }

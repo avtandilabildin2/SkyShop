@@ -2,6 +2,7 @@ package org.skypro.skyshop.model.search;
 
 import org.skypro.skyshop.comparators.Comparator1;
 import org.skypro.skyshop.exceptions.BestResultNotFound;
+import org.skypro.skyshop.exceptions.NoSuchProductException;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,6 +51,9 @@ public class SearchEngine {
 
     }
     public void addSearchable(Searchable searchable) {
+        if (searchable==null) {
+            throw new NoSuchProductException("Элемент пустой!!!");
+        }
         searchables.add( searchable);
 
     }
